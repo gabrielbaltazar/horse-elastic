@@ -1,0 +1,11 @@
+{
+	"name": "HorseElastic",
+	"description": "",
+	"version": "1.0.0",
+	"homepage": "https://github.com/gabrielbaltazar/horse-elastic",
+	"mainsrc": "Source",
+	"projects": [],
+	"dependencies": {
+		"github.com/gabrielbaltazar/gbclient": "2.0.1"
+	}
+}
