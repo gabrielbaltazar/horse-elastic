@@ -25,13 +25,14 @@ type
     procedure SaveLogCache;
     function ExtractLogCache: TArray<string>;
   public
+    class function GetInstance: THorseElasticLogger;
+    class destructor UnInitialize;
+
     procedure AfterConstruction; override;
     procedure BeforeDestruction; override;
     procedure Execute; override;
 
     function NewLog(ALog: string): THorseElasticLogger;
-    class function GetInstance: THorseElasticLogger;
-    class destructor UnInitialize;
   end;
 
 implementation
@@ -51,7 +52,7 @@ begin
   inherited;
   FLogCache.Free;
   FEvent.Free;
-  FCriticalSection.Free;;
+  FCriticalSection.Free;
 end;
 
 procedure THorseElasticLogger.Execute;
@@ -93,12 +94,12 @@ class function THorseElasticLogger.GetInstance: THorseElasticLogger;
 begin
   if not Assigned(FHorseElasticLogger) then
   begin
-    FHorseElasticLogger := THorseElasticLogger.create(True);
+    FHorseElasticLogger := THorseElasticLogger.Create(True);
     FHorseElasticLogger.FreeOnTerminate := True;
     FHorseElasticLogger.Start;
   end;
 
-  result := FHorseElasticLogger;
+  Result := FHorseElasticLogger;
 end;
 
 function THorseElasticLogger.NewLog(ALog: string): THorseElasticLogger;
@@ -117,16 +118,16 @@ procedure THorseElasticLogger.SaveLogCache;
 var
   LLogCacheArray: TArray<string>;
   I: Integer;
-  request: IGBClientRequest;
+  LRequest: IGBClientRequest;
 begin
   FCriticalSection.Enter;
   try
     try
       LLogCacheArray := ExtractLogCache;
-      request := NewClientRequest;
+      LRequest := NewClientRequest;
       for I := Low(LLogCacheArray) to High(LLogCacheArray) do
       begin
-        request
+        LRequest
           .POST
           .BaseURL(THorseElasticConfig.GetInstance.BaseUrl)
           .Resource(THorseElasticConfig.GetInstance.Resource)
@@ -137,17 +138,17 @@ begin
 
         if THorseElasticConfig.GetInstance.&Platform = epAws then
         begin
-          request
-            .Authorization.AWSv4
-              .AccessKey(THorseElasticConfig.GetInstance.UserName)
-              .SecretKey(THorseElasticConfig.GetInstance.Password)
-              .Region(THorseElasticConfig.GetInstance.AWSRegion);
+          LRequest.Authorization.AWSv4
+            .AccessKey(THorseElasticConfig.GetInstance.UserName)
+            .SecretKey(THorseElasticConfig.GetInstance.Password)
+            .Region(THorseElasticConfig.GetInstance.AWSRegion);
         end;
 
-        request.Send;
+        LRequest.Send;
       end;
     except
-      FCriticalSection.Leave;
+      on E: Exception do
+        System.Writeln(E.Message);
     end;
   finally
     FCriticalSection.Leave;

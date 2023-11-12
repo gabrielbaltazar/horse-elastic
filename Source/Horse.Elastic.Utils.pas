@@ -6,40 +6,41 @@ uses
   Horse.Elastic.Config,
   System.SysUtils;
 
-function GetValue(const Value: Int64): string; overload;
-function GetValue(const Value: Integer): string; overload;
-function GetValue(const Value: String): string; overload;
-function GetValue(const Value: TDateTime): string; overload;
-function GetValueContent(const Value: String): string;
+function GetValue(const AValue: Int64): string; overload;
+function GetValue(const AValue: Integer): string; overload;
+function GetValue(const AValue: string): string; overload;
+function GetValue(const AValue: TDateTime): string; overload;
+function GetValueContent(const AValue: string): string;
 
 implementation
 
-function GetValue(const Value: Int64): string;
+function GetValue(const AValue: Int64): string;
 begin
-  result := Value.ToString;
+  Result := AValue.ToString;
 end;
 
-function GetValue(const Value: Integer): string;
+function GetValue(const AValue: Integer): string;
 begin
-  result := Value.ToString;
+  Result := AValue.ToString;
 end;
 
-function GetValue(const Value: String): string;
+function GetValue(const AValue: string): string;
 begin
-  result := Value;
+  Result := AValue;
 end;
 
-function GetValue(const Value: TDateTime): string;
+function GetValue(const AValue: TDateTime): string;
 begin
-  result := FormatDateTime(THorseElasticConfig.GetInstance.DateFormat, Value);
+  Result := FormatDateTime(THorseElasticConfig.GetInstance.DateFormat, AValue);
 end;
 
-function GetValueContent(const Value: String): string;
+function GetValueContent(const AValue: string): string;
 begin
-  result := Value.Replace(#9, EmptyStr)
-                 .Replace(#$A, EmptyStr)
-                 .Replace(#$D, EmptyStr)
-                 .Replace('"', '\"');
+  Result := AValue
+    .Replace(#9, EmptyStr)
+    .Replace(#$A, EmptyStr)
+    .Replace(#$D, EmptyStr)
+    .Replace('"', '\"');
 end;
 
 end.
