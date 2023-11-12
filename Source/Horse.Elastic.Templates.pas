@@ -34,7 +34,7 @@ const
     '"request_authorization": "${request_authorization}",'+
     '"request_content_encoding": "${request_content_encoding}",'+
     '"request_content_type": "${request_content_type}",'+
-    '"request_content_length": ${request_content_length},'+
+    '"request_content_length": "${request_content_length}",'+
     '"request_content_version": "${request_content_version}",'+
     '"request_content": "${request_content}"'+
     '},'+
