@@ -14,11 +14,12 @@ uses
 const
   BAD_REQUEST = 400;
 
-  epLocal = Horse.Elastic.Config.epLocal;
-  epAws = Horse.Elastic.Config.epAws;
+  eaNone = Horse.Elastic.Config.eaNone;
+  eaBasic = Horse.Elastic.Config.eaBasic;
+  eaAWS = Horse.Elastic.Config.eaAWS;
 
 type
-  TElasticPlatform = Horse.Elastic.Config.TElasticPlatform;
+  TElasticAuth = Horse.Elastic.Config.TElasticAuth;
   THorseElasticConfig = Horse.Elastic.Config.THorseElasticConfig;
   THorseElasticLogger = Horse.Elastic.Logger.THorseElasticLogger;
   THorseElasticOnFormatTag = function(ATag: string; AReq: THorseRequest; ARes: THorseResponse): string;
@@ -154,10 +155,7 @@ begin
       LLog := LLog.Replace('${response_content_version}', GetValue(LWebResponse.ContentVersion));
       LLog := LLog.Replace('${response_status}', GetValue(LWebResponse.StatusCode));
 
-      if LWebResponse.StatusCode >= BAD_REQUEST then
-        LLog := LLog.Replace('${response_content}', GetValueContent(LWebResponse.Content))
-      else
-        LLog := LLog.Replace('${response_content}', EmptyStr);
+      LLog := LLog.Replace('${response_content}', GetValueContent(LWebResponse.Content));
 
       LLog := FormatCustomValues(LLog, AReq, ARes);
       THorseElasticLogger.GetInstance.NewLog(LLog);

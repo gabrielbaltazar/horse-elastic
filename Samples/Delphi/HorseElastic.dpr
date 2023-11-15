@@ -15,23 +15,42 @@ begin
   IsConsole := False;
   ReportMemoryLeaksOnShutdown := True;
 
+  THorseElasticConfig.GetInstance
+    .HoursDiff(3)
+    .BaseUrl('https://localhost:9200')
+    .Resource('passaporte/_doc')
+    .AuthType(eaBasic)
+    .UserName('elastic')
+    .Password('G_xquEr9_nEoHU*J-y2j');
+
   THorse
-    .Use(THorseElasticLogger.Build) // It has to be before the Jhonson middleware
+    .Use(Horse.Elastic.HorseElastic) // It has to be before the Jhonson middleware
     .Use(Jhonson);
 
   THorse.Get('ping',
-    procedure(Req: THorseRequest; Res: THorseResponse; Next: TProc)
+    procedure(AReq: THorseRequest; ARes: THorseResponse; ANext: TProc)
     var
-      json: TJsonObject;
+      LJson: TJsonObject;
     begin
-      json := TJSONObject.Create;
-      json.AddPair('ping', 'pong');
+      LJson := TJSONObject.Create;
+      LJson.AddPair('ping', 'pong');
 
-      Res.Send<TJSONObject>(json);
+      ARes.Send<TJSONObject>(LJson);
+    end);
+
+  THorse.Post('ping',
+    procedure(AReq: THorseRequest; ARes: THorseResponse; ANext: TProc)
+    var
+      LJson: TJsonObject;
+    begin
+      LJson := TJSONObject.Create;
+      LJson.AddPair('ping', 'pong');
+
+      ARes.Send<TJSONObject>(LJson);
     end);
 
   THorse.Listen(9000,
-    procedure(Horse: THorse)
+    procedure(AHorse: THorse)
     begin
       Readln;
     end);

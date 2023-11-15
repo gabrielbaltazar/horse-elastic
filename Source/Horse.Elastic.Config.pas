@@ -10,13 +10,14 @@ uses
   System.Generics.Collections;
 
 type
-  TElasticPlatform = (epLocal, epAws);
+  TElasticAuth = (eaNone, eaBasic, eaAWS);
 
   THorseElasticConfig = class
   private
     class var FInstance: THorseElasticConfig;
 
-    FPlatform: TElasticPlatform;
+    FAuthType: TElasticAuth;
+    FHoursDiff: Integer;
     FDateFormat: string;
     FLogFormat: string;
     FBaseUrl: string;
@@ -46,8 +47,8 @@ type
     function ContentType(AValue: string): THorseElasticConfig; overload;
     function ContentType: string; overload;
 
-    function &Platform(AValue: TElasticPlatform): THorseElasticConfig; overload;
-    function &Platform: TElasticPlatform; overload;
+    function AuthType(AValue: TElasticAuth): THorseElasticConfig; overload;
+    function AuthType: TElasticAuth; overload;
 
     function LogFormat(AValue: string): THorseElasticConfig; overload;
     function LogFormat: string; overload;
@@ -63,6 +64,9 @@ type
 
     function AWSRegion(AValue: string): THorseElasticConfig; overload;
     function AWSRegion: string; overload;
+
+    function HoursDiff(AValue: Integer): THorseElasticConfig; overload;
+    function HoursDiff: Integer; overload;
 
     function IgnoreRoute(AValue: string): THorseElasticConfig;
     function IgnoreRoutes: TArray<string>;
@@ -129,6 +133,17 @@ begin
   end;
 end;
 
+function THorseElasticConfig.AuthType: TElasticAuth;
+begin
+  Result := FAuthType;
+end;
+
+function THorseElasticConfig.AuthType(AValue: TElasticAuth): THorseElasticConfig;
+begin
+  Result := Self;
+  FAuthType := AValue;
+end;
+
 function THorseElasticConfig.AWSRegion: string;
 begin
   Result := FAWSRegion;
@@ -183,7 +198,7 @@ begin
   FBaseUrl := 'http://localhost:9200';
   FResource := 'indice/_doc';
   FDateFormat := 'yyyy-MM-dd''T''hh:mm:ss';
-  FPlatform := epLocal;
+  FAuthType := eaNone;
   FAWSRegion := 'us-east-1';
   FContentType := 'application/json';
   FLogFormat := DEFAULT_LOG_FORMAT;
@@ -212,6 +227,17 @@ begin
   if not Assigned(FInstance) then
     FInstance := THorseElasticConfig.CreatePrivate;
   Result := FInstance;
+end;
+
+function THorseElasticConfig.HoursDiff: Integer;
+begin
+  Result := FHoursDiff;
+end;
+
+function THorseElasticConfig.HoursDiff(AValue: Integer): THorseElasticConfig;
+begin
+  Result := Self;
+  FHoursDiff := AValue;
 end;
 
 function THorseElasticConfig.IgnoreRoute(AValue: string): THorseElasticConfig;
@@ -258,11 +284,6 @@ begin
   FLogFormat := AValue;
 end;
 
-function THorseElasticConfig.Platform: TElasticPlatform;
-begin
-  Result := FPlatform;
-end;
-
 function THorseElasticConfig.Resource: string;
 begin
   Result := FResource;
@@ -272,12 +293,6 @@ function THorseElasticConfig.Resource(AValue: string): THorseElasticConfig;
 begin
   Result := Self;
   FResource := AValue;
-end;
-
-function THorseElasticConfig.Platform(AValue: TElasticPlatform): THorseElasticConfig;
-begin
-  Result := Self;
-  FPlatform := AValue;
 end;
 
 class destructor THorseElasticConfig.UnInitialize;
