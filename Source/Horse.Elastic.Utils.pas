@@ -37,7 +37,7 @@ var
 begin
   LData := AValue;
   LHoursDiff := THorseElasticConfig.GetInstance.HoursDiff;
-  if LHoursDiff > 0 then
+  if LHoursDiff <> 0 then
     LData := IncHour(LData, LHoursDiff);
   Result := FormatDateTime(THorseElasticConfig.GetInstance.DateFormat, LData);
 end;

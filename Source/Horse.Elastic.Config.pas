@@ -203,6 +203,7 @@ begin
   FContentType := 'application/json';
   FLogFormat := DEFAULT_LOG_FORMAT;
   FIgnoreRoutes := TList<string>.Create;
+  FHoursDiff := 0;
 end;
 
 function THorseElasticConfig.DateFormat: string;
