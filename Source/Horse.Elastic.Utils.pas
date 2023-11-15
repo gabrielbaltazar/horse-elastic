@@ -4,6 +4,7 @@ interface
 
 uses
   Horse.Elastic.Config,
+  System.DateUtils,
   System.SysUtils;
 
 function GetValue(const AValue: Int64): string; overload;
@@ -30,8 +31,15 @@ begin
 end;
 
 function GetValue(const AValue: TDateTime): string;
+var
+  LData: TDateTime;
+  LHoursDiff: Integer;
 begin
-  Result := FormatDateTime(THorseElasticConfig.GetInstance.DateFormat, AValue);
+  LData := AValue;
+  LHoursDiff := THorseElasticConfig.GetInstance.HoursDiff;
+  if LHoursDiff > 0 then
+    LData := IncHour(LData, LHoursDiff);
+  Result := FormatDateTime(THorseElasticConfig.GetInstance.DateFormat, LData);
 end;
 
 function GetValueContent(const AValue: string): string;

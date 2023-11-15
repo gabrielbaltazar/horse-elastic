@@ -7,6 +7,7 @@ uses
   Horse.Elastic.Config,
   GBClient.Interfaces,
   GBClient.Core.Types,
+  System.JSON,
   System.SysUtils,
   System.Classes,
   System.DateUtils,
@@ -117,6 +118,7 @@ end;
 procedure THorseElasticLogger.SaveLogCache;
 var
   LLogCacheArray: TArray<string>;
+  LJsonValue: TJSONObject;
   I: Integer;
   LRequest: IGBClientRequest;
 begin
@@ -127,21 +129,33 @@ begin
       LRequest := NewClientRequest;
       for I := Low(LLogCacheArray) to High(LLogCacheArray) do
       begin
-        LRequest
-          .POST
-          .BaseURL(THorseElasticConfig.GetInstance.BaseUrl)
-          .Resource(THorseElasticConfig.GetInstance.Resource)
-          .ContentType(THorseElasticConfig.GetInstance.ContentType)
-          .Params
-            .BodyAddOrSet(LLogCacheArray[I])
-          .&End;
+        LJsonValue := TJSONObject.ParseJSONValue(LLogCacheArray[I]) as TJSONObject;
+        try
+          LRequest
+            .POST
+            .BaseURL(THorseElasticConfig.GetInstance.BaseUrl)
+            .Resource(THorseElasticConfig.GetInstance.Resource)
+            .ContentType(THorseElasticConfig.GetInstance.ContentType)
+            .Params
+              .BodyAddOrSet(LJsonValue.ToJSON)
+            .&End;
+        finally
+          LJsonValue.Free;
+        end;
 
-        if THorseElasticConfig.GetInstance.&Platform = epAws then
+        if THorseElasticConfig.GetInstance.AuthType = eaAWS then
         begin
           LRequest.Authorization.AWSv4
             .AccessKey(THorseElasticConfig.GetInstance.UserName)
             .SecretKey(THorseElasticConfig.GetInstance.Password)
             .Region(THorseElasticConfig.GetInstance.AWSRegion);
+        end
+        else
+        if THorseElasticConfig.GetInstance.AuthType = eaBasic then
+        begin
+          LRequest.Authorization.Basic
+            .Username(THorseElasticConfig.GetInstance.UserName)
+            .Password(THorseElasticConfig.GetInstance.Password);
         end;
 
         LRequest.Send;
