@@ -6,7 +6,7 @@ const
   DEFAULT_LOG_FORMAT =
     '{'+
     '"execution_date": "${execution_date}",'+
-    '"execution_time": "${execution_time}",'+
+    '"execution_time": ${execution_time},'+
     '"exception_message": "${exception_message}",'+
     '"request": {'+
     '"request_method": "${request_method}",'+
